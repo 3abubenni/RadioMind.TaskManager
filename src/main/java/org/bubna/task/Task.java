@@ -40,6 +40,7 @@ public class Task<F, T> extends PanacheEntity {
 
     @NotNull
     @JsonView(View.GET.class)
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
     @NotNull

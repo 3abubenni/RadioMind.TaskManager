@@ -15,7 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 @Tag(description = "Контроллер для управления задачами", name = "Tag Controller")
 public class TaskResource {
 
-    private final TaskService taskService;
+    final TaskService taskService;
 
     @GET
     public PageOfEntities<Task<?, ?>> getTasks(

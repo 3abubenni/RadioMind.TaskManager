@@ -16,7 +16,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 @Tag(description = "Контроллер для управления данными", name = "Data Controller")
 public class DataResource {
 
-    private final DataService dataService;
+    final DataService dataService;
 
     @Operation(description = "Добавить данные на обработку")
     @POST

@@ -3,16 +3,21 @@ package org.bubna.task;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bubna.ai.AiClassification;
 import org.bubna.data.DataEntity;
 import org.bubna.paging.PageOfEntities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bubna.task.rabbitmq.TaskRabbitMqProducer;
+
+import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor
+@Slf4j
 public class TaskService {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
+    final TaskRabbitMqProducer rabbitMqProducer;
 
     @Transactional
     public Task<DataEntity, AiClassification> createClassificationTask(DataEntity data) {
@@ -43,6 +48,32 @@ public class TaskService {
                 pageSize,
                 taskPanacheQuery.pageCount()
         );
+    }
+
+    public void sentPendingTasksToQueue() {
+        log.info("Start Sending Pending Tasks to Queue");
+        List<Task<?, ?>> tasks = Task.find("status", TaskStatus.PENDING).list();
+        log.info("{} Tasks found", tasks.size());
+        int sentTasks = tasks.stream()
+                .map(this::sendPendingTaskToQueue)
+                .mapToInt(taskSent -> taskSent ? 1 : 0)
+                .sum();
+
+        log.info("{} Tasks sent", sentTasks);
+    }
+
+    @Transactional
+    protected boolean sendPendingTaskToQueue(Task<?, ?> task) {
+        log.info("Sending Task with id '{}' to queue", task.getId());
+        try {
+            task.setStatus(TaskStatus.SENT);
+            task.persist();
+            rabbitMqProducer.sendTask(task);
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
 }

@@ -111,6 +111,22 @@
             <version>5.2.18.Final</version>
             <type>pom</type>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.quarkiverse.rabbitmqclient/quarkus-rabbitmq-client -->
+        <dependency>
+            <groupId>io.quarkiverse.rabbitmqclient</groupId>
+            <artifactId>quarkus-rabbitmq-client</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-quartz</artifactId>
+            <version>3.22.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jackson</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
